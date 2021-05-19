@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styles from './Homepage.module.css';
 
 function Homepage(props) {
   const [games, setGames] = useState([]);
@@ -57,7 +56,7 @@ function Homepage(props) {
 
   return (
     <>
-      <h3 className={styles.text}>Games:</h3> <ul>{list}</ul>
+      <h3>Games:</h3> <ul>{list}</ul>
     </>
   );
 }

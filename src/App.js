@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import List from './List.js';
 import Homepage from './Homepage.js';
 import Display from './Display.js';
