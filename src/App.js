@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import List from './List.js';
 import Homepage from './Homepage.js';
 import Display from './Display.js';
@@ -64,9 +65,10 @@ function App() {
     );
   }
   return (
-    <div className="App">
-      <header className="App-header">{view}</header>
-    </div>
+    <>
+      <CssBaseline />
+      {view}
+    </>
   );
 }
 
