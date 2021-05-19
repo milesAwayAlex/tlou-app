@@ -1,3 +1,23 @@
+@import-normalize;
+/* custom colors go here */
+:root {
+  --black: #161412;
+  --gray: #2d2925;
+  --accent: #e07000;
+  --offwhite: #857885;
+  --white: #ffebd6;
+}
+
+/* set the box model to alternative */
+html {
+  box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
