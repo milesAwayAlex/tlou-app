@@ -3,6 +3,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import List from './List.js';
 import Homepage from './Homepage.js';
 import Display from './Display.js';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { amber } from '@material-ui/core/colors';
 
 function App() {
   const [screen, setScreen] = useState('');
@@ -12,6 +14,16 @@ function App() {
     types: [],
   });
   const apiUrl = 'http://localhost:1337/api';
+
+  const darkTheme = createMuiTheme({
+    palette: { type: 'dark', primary: amber },
+    props: {
+      MuiGrid: {
+        alignItems: 'center',
+        justify: 'center',
+      },
+    },
+  });
 
   // load the state from localStorage
   useEffect(() => {
@@ -67,7 +79,7 @@ function App() {
   return (
     <>
       <CssBaseline />
-      {view}
+      <ThemeProvider theme={darkTheme}>{view}</ThemeProvider>
     </>
   );
 }
