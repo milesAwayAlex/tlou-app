@@ -1,4 +1,51 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Grid,
+  makeStyles,
+  Paper,
+  List as Mlist,
+  Typography,
+  ListItem,
+} from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    minHeight: '100vh',
+  },
+  wall: {
+    backgroundColor: theme.palette.background.default,
+    justifyContent: 'flex-start',
+  },
+  fixed: {
+    position: 'fixed',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingInline: theme.spacing(3),
+    [theme.breakpoints.down('xs')]: {
+      position: 'static',
+      height: 'auto',
+      paddingBlockEnd: theme.spacing(3),
+    },
+  },
+  grayWall: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(3),
+    [theme.breakpoints.down('xs')]: {
+      backgroundColor: theme.palette.background.default,
+    },
+  },
+  margin: {
+    marginTop: theme.spacing(2),
+  },
+  list: {
+    width: '100%',
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
 
 // the item to be displayed on the selection list
 function Item(props) {
@@ -116,15 +163,17 @@ function Item(props) {
     );
   }
   return (
-    <li>
+    <ListItem button>
       {props.item.name}
       {button} {selButton}
       {sections}
-    </li>
+    </ListItem>
   );
 }
+
 // display chapters/types as a category
 function Category(props) {
+  const classes = useStyles();
   let button;
   // while displaying the types, add the 'Select All' button
   if (props.catName === 'types') {
@@ -176,7 +225,7 @@ function Category(props) {
     <>
       <h3>{props.catName}</h3>
       <div>{button}</div>
-      <ul>{list}</ul>
+      <Mlist className={classes.list}>{list}</Mlist>
     </>
   );
 }
@@ -204,6 +253,9 @@ function List(props) {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const classes = useStyles();
+
   let list = 'Loading..';
   // upon fetching the data
   if (data) {
@@ -228,32 +280,83 @@ function List(props) {
   }
   // display the list of categories and the button to go to the items
   return (
-    <div>
-      {list}
-      <div>
-        <button
-          onClick={() => {
-            props.setScreen('home');
-          }}
+    <>
+      <Grid
+        container
+        component="main"
+        alignItems="stretch"
+        className={classes.root}
+      >
+        <Grid
+          container
+          item
+          xs={12}
+          sm={8}
+          md={9}
+          component={Paper}
+          square
+          className={classes.grayWall}
         >
-          Back
-        </button>
-        <button
-          onClick={() => {
-            localStorage.removeItem('collected');
-          }}
+          <Grid item xs={12} md={6}>
+            {list[0]}
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {list[1]}
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          direction="column"
+          item
+          xs={12}
+          sm={4}
+          md={3}
+          className={classes.wall}
         >
-          Reset All Collected
-        </button>
-        <button
-          onClick={() => {
-            props.setScreen('main');
-          }}
-        >
-          Start
-        </button>
-      </div>
-    </div>
+          <Box className={classes.fixed}>
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              color="primary"
+              disableElevation
+              className={classes.margin}
+              onClick={() => {
+                props.setScreen('home');
+              }}
+            >
+              Back
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              color="primary"
+              disableElevation
+              className={classes.margin}
+              onClick={() => {
+                localStorage.removeItem('collected');
+              }}
+            >
+              Reset Collected
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              color="primary"
+              disableElevation
+              className={classes.margin}
+              onClick={() => {
+                props.setScreen('main');
+              }}
+            >
+              Start
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+    </>
   );
 }
 
