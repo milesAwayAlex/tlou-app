@@ -6,9 +6,16 @@ import {
   makeStyles,
   Paper,
   List as Mlist,
-  Typography,
   ListItem,
+  ListItemIcon,
+  Checkbox,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+  Collapse,
+  Typography,
 } from '@material-ui/core';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,6 +41,7 @@ const useStyles = makeStyles(theme => ({
   grayWall: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(3),
+    alignItems: 'flex-start',
     [theme.breakpoints.down('xs')]: {
       backgroundColor: theme.palette.background.default,
     },
@@ -43,7 +51,24 @@ const useStyles = makeStyles(theme => ({
   },
   list: {
     width: '100%',
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
+  },
+  sectionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingBlockStart: theme.spacing(3),
+  },
+  pageHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingBlock: theme.spacing(2),
+    paddingInline: theme.spacing(4),
+    [theme.breakpoints.down('sm')]: {
+      justifyContent: 'center',
+      paddingInline: 0,
+    },
   },
 }));
 
@@ -54,120 +79,152 @@ function Item(props) {
   let button;
   let sections;
   // for types - select or remove the type
-  let selButton = (
-    <button
-      onClick={() => {
-        if (!props.selected.types.includes(props.item._id)) {
-          props.setSelected({
-            ...props.selected,
-            types: props.selected.types.concat(props.item._id),
-          });
-        } else {
-          props.setSelected({
-            ...props.selected,
-            types: props.selected.types.filter(
-              typeid => typeid !== props.item._id
-            ),
-          });
-        }
-      }}
-    >
-      {props.selected.types.includes(props.item._id) ? 'Remove' : 'Select'}
-    </button>
-  );
+  let select = () => {
+    if (!props.selected.types.includes(props.item._id)) {
+      props.setSelected({
+        ...props.selected,
+        types: props.selected.types.concat(props.item._id),
+      });
+    } else {
+      props.setSelected({
+        ...props.selected,
+        types: props.selected.types.filter(typeid => typeid !== props.item._id),
+      });
+    }
+  };
+  let selected = props.selected.types.includes(props.item._id);
+  // let selButton = (
+  //   <button
+  //     onClick={() => {
+  //       select();
+  //     }}
+  //   >
+  //     {selected ? 'Remove' : 'Select'}
+  //   </button>
+  // );
   // chapters have different buttons
   if (props.item.sections) {
     // toggle sections display
     button = (
-      <button onClick={() => setShow(!showSections)}>
-        {showSections ? 'Hide Sections' : 'Show Sections'}
-      </button>
+      <ListItemSecondaryAction>
+        <IconButton edge="end" onClick={() => setShow(!showSections)}>
+          {showSections ? <ExpandLess /> : <ExpandMore />}
+        </IconButton>
+      </ListItemSecondaryAction>
     );
     // test if all sections of the chapter are selected
-    const sectionsSelected = !props.item.sections.some(
+    selected = !props.item.sections.some(
       section => !props.selected.sections.includes(section._id)
     );
-    selButton = (
-      <button
-        onClick={() => {
-          if (!sectionsSelected) {
-            // determine which sections need to be added to the selection
-            let sections = [];
-            props.item.sections.forEach(section => {
-              if (!props.selected.sections.includes(section._id)) {
-                sections.push(section._id);
-              }
-            });
-            // add the sections to the selection
-            props.setSelected({
-              ...props.selected,
-              sections: props.selected.sections.concat(sections),
-            });
-          } else {
-            // remove every section from the selection
-            props.setSelected({
-              ...props.selected,
-              sections: props.selected.sections.filter(
-                sectionid =>
-                  !props.item.sections
-                    .map(section => section._id)
-                    .includes(sectionid)
-              ),
-            });
+    select = () => {
+      if (!selected) {
+        // determine which sections need to be added to the selection
+        let sections = [];
+        props.item.sections.forEach(section => {
+          if (!props.selected.sections.includes(section._id)) {
+            sections.push(section._id);
           }
-        }}
-      >
-        {sectionsSelected ? 'Remove Chapter' : 'Select Chapter'}
-      </button>
+        });
+        // add the sections to the selection
+        props.setSelected({
+          ...props.selected,
+          sections: props.selected.sections.concat(sections),
+        });
+      } else {
+        // remove every section from the selection
+        props.setSelected({
+          ...props.selected,
+          sections: props.selected.sections.filter(
+            sectionid =>
+              !props.item.sections
+                .map(section => section._id)
+                .includes(sectionid)
+          ),
+        });
+      }
+    };
+    // selButton = (
+    //   <button
+    //     onClick={() => {
+    //       select();
+    //     }}
+    //   >
+    //     {selected ? 'Remove Chapter' : 'Select Chapter'}
+    //   </button>
+    // );
+
+    // only generate sections for chapters
+    sections = (
+      <Collapse in={showSections} timeout="auto" unmountOnExit>
+        <ul>
+          {props.item.sections.map(item => (
+            <Item
+              key={item._id}
+              item={item}
+              selected={props.selected}
+              setSelected={props.setSelected}
+            />
+          ))}
+        </ul>
+      </Collapse>
     );
   }
   // sections have the third set of buttons
   if (props.item.articles) {
-    selButton = (
-      <button
+    select = () => {
+      // if the section is not selected - add it to the selection
+      if (!props.selected.sections.includes(props.item._id)) {
+        props.setSelected({
+          ...props.selected,
+          sections: props.selected.sections.concat(props.item._id),
+        });
+      } else {
+        // otherwise remove it
+        props.setSelected({
+          ...props.selected,
+          sections: props.selected.sections.filter(
+            sectionid => sectionid !== props.item._id
+          ),
+        });
+      }
+    };
+    selected = props.selected.sections.includes(props.item._id);
+    // selButton = (
+    //   <button
+    //     onClick={() => {
+    //       select();
+    //     }}
+    //   >
+    //     {selected ? 'Remove' : 'Select'}
+    //   </button>
+    // );
+  }
+
+  return (
+    <>
+      <ListItem
+        // dense
+        button
+        // role={undefined}
         onClick={() => {
-          // if the section is not selected - add it to the selection
-          if (!props.selected.sections.includes(props.item._id)) {
-            props.setSelected({
-              ...props.selected,
-              sections: props.selected.sections.concat(props.item._id),
-            });
-          } else {
-            // otherwise remove it
-            props.setSelected({
-              ...props.selected,
-              sections: props.selected.sections.filter(
-                sectionid => sectionid !== props.item._id
-              ),
-            });
-          }
+          select();
         }}
       >
-        {props.selected.sections.includes(props.item._id) ? 'Remove' : 'Select'}
-      </button>
-    );
-  }
-  // only display sections if showSections is true
-  if (showSections) {
-    sections = (
-      <ul>
-        {props.item.sections.map(item => (
-          <Item
-            key={item._id}
-            item={item}
-            selected={props.selected}
-            setSelected={props.setSelected}
+        <ListItemIcon>
+          <Checkbox
+            edge="start"
+            disableRipple
+            tabIndex={-1}
+            checked={selected}
+            color="primary"
+            // size="small"
           />
-        ))}
-      </ul>
-    );
-  }
-  return (
-    <ListItem button>
-      {props.item.name}
-      {button} {selButton}
+        </ListItemIcon>
+        <ListItemText primary={props.item.name} />
+        {button}
+      </ListItem>
       {sections}
-    </ListItem>
+    </>
   );
 }
 
@@ -175,8 +232,10 @@ function Item(props) {
 function Category(props) {
   const classes = useStyles();
   let button;
+  let title;
   // while displaying the types, add the 'Select All' button
   if (props.catName === 'types') {
+    title = 'Select by Type';
     // test allTypesSelected = if all types are selected
     const allTypesSelected = props.catArray
       .map(type => type._id)
@@ -184,7 +243,9 @@ function Category(props) {
     // select/clear all types
     // display button text contingent on allTypesSelected
     button = (
-      <button
+      <Button
+        variant="outlined"
+        disableElevation
         onClick={() => {
           if (allTypesSelected) {
             props.setSelected({ ...props.selected, types: [] });
@@ -197,20 +258,23 @@ function Category(props) {
         }}
       >
         {allTypesSelected ? 'Clear All' : 'Select All'}
-      </button>
+      </Button>
     );
   }
   // while displaying chapters, add the 'Clear All' button
   if (props.catName === 'chapters') {
+    title = 'Select by Chapter';
     // clear all sections
     button = (
-      <button
+      <Button
+        variant="outlined"
+        disableElevation
         onClick={() => {
           props.setSelected({ ...props.selected, sections: [] });
         }}
       >
         Clear All
-      </button>
+      </Button>
     );
   }
   const list = props.catArray.map(item => (
@@ -223,8 +287,12 @@ function Category(props) {
   ));
   return (
     <>
-      <h3>{props.catName}</h3>
-      <div>{button}</div>
+      <Box className={classes.sectionHeader}>
+        <Typography component="h2" variant="h5">
+          {title}
+        </Typography>
+        {button}
+      </Box>
       <Mlist className={classes.list}>{list}</Mlist>
     </>
   );
@@ -297,6 +365,11 @@ function List(props) {
           square
           className={classes.grayWall}
         >
+          <Grid item xs={12} className={classes.pageHeader}>
+            <Typography component="h1" variant="h3">
+              {props.selected.game}
+            </Typography>
+          </Grid>
           <Grid item xs={12} md={6}>
             {list[0]}
           </Grid>
