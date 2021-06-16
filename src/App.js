@@ -3,7 +3,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import List from './List.js';
 import Homepage from './Homepage.js';
 import Display from './Display.js';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { createMuiTheme, ThemeProvider, Typography } from '@material-ui/core';
 import { amber } from '@material-ui/core/colors';
 
 function App() {
@@ -21,6 +21,13 @@ function App() {
       MuiGrid: {
         alignItems: 'center',
         justify: 'center',
+      },
+      MuiButton: {
+        variant: 'outlined',
+        size: 'large',
+        fullWidth: true,
+        disableElevation: true,
+        color: 'primary',
       },
     },
   });
@@ -46,7 +53,7 @@ function App() {
     localStorage.setItem('selected', JSON.stringify(selected));
   }, [screen, selected]);
 
-  let view = 'Loading..';
+  let view = <Typography component="h1"> Loading..</Typography>;
   // only render the Homepage if the effects have finished running
   if (screen === 'home') {
     view = (

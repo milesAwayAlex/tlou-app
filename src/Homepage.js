@@ -16,7 +16,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     [theme.breakpoints.down('xs')]: {
       backgroundColor: theme.palette.background.default,
-      // justifyContent: 'flex-end',
     },
   },
   margin: {
@@ -51,16 +50,15 @@ function Homepage(props) {
   }, []);
   const classes = useStyles();
 
-  let list = 'Loading..';
+  let list = (
+    <Typography component="p" variant="h2">
+      Loading..
+    </Typography>
+  );
   if (games) {
     list = games.map(game => (
       <Button
         key={game}
-        variant="outlined"
-        size="large"
-        fullWidth
-        color="primary"
-        disableElevation
         className={classes.margin}
         onClick={() => {
           props.setScreen('select');
@@ -74,12 +72,7 @@ function Homepage(props) {
       list.push(
         <Button
           key={'displayStored'}
-          variant="outlined"
-          disableElevation
-          fullWidth
           className={classes.margin}
-          size="large"
-          color="primary"
           onClick={() => {
             props.setScreen('main');
           }}

@@ -51,7 +51,6 @@ const useStyles = makeStyles(theme => ({
   },
   list: {
     width: '100%',
-    // backgroundColor: theme.palette.background.paper,
   },
   sectionHeader: {
     display: 'flex',
@@ -93,6 +92,7 @@ function Item(props) {
     }
   };
   let selected = props.selected.types.includes(props.item._id);
+  let indeterminate = false;
   // let selButton = (
   //   <button
   //     onClick={() => {
@@ -113,9 +113,14 @@ function Item(props) {
       </ListItemSecondaryAction>
     );
     // test if all sections of the chapter are selected
-    selected = !props.item.sections.some(
-      section => !props.selected.sections.includes(section._id)
+    selected = props.item.sections.every(section =>
+      props.selected.sections.includes(section._id)
     );
+    indeterminate = selected
+      ? false
+      : props.item.sections.some(section =>
+          props.selected.sections.includes(section._id)
+        );
     select = () => {
       if (!selected) {
         // determine which sections need to be added to the selection
@@ -215,6 +220,7 @@ function Item(props) {
             edge="start"
             disableRipple
             tabIndex={-1}
+            indeterminate={indeterminate}
             checked={selected}
             color="primary"
             // size="small"
@@ -244,8 +250,9 @@ function Category(props) {
     // display button text contingent on allTypesSelected
     button = (
       <Button
-        variant="outlined"
-        disableElevation
+        color="default"
+        fullWidth={false}
+        size="medium"
         onClick={() => {
           if (allTypesSelected) {
             props.setSelected({ ...props.selected, types: [] });
@@ -267,8 +274,9 @@ function Category(props) {
     // clear all sections
     button = (
       <Button
-        variant="outlined"
-        disableElevation
+        color="default"
+        fullWidth={false}
+        size="medium"
         onClick={() => {
           props.setSelected({ ...props.selected, sections: [] });
         }}
@@ -321,10 +329,24 @@ function List(props) {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const classes = useStyles();
 
-  let list = 'Loading..';
+  // function to set selected to section 1
+  const setFirstSection = async () => {
+    try {
+      const res = await fetch(apiUrl + '/next', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([]),
+      });
+      const json = await res.json();
+      props.setSelected({ ...props.selected, sections: [json._id] });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  let list = <Typography component="h2">Loading..</Typography>;
   // upon fetching the data
   if (data) {
     list = [];
@@ -388,43 +410,38 @@ function List(props) {
         >
           <Box className={classes.fixed}>
             <Button
-              variant="outlined"
-              size="large"
-              fullWidth
-              color="primary"
-              disableElevation
               className={classes.margin}
               onClick={() => {
                 props.setScreen('home');
               }}
             >
-              Back
+              Main Menu
             </Button>
             <Button
-              variant="outlined"
-              size="large"
-              fullWidth
-              color="primary"
-              disableElevation
+              className={classes.margin}
+              onClick={() => {
+                if (!props.selected.types.length) {
+                  props.setSelected({
+                    ...props.selected,
+                    types: data.types.map(type => type._id),
+                  });
+                } else if (!props.selected.sections.length) {
+                  setFirstSection();
+                  props.setScreen('main');
+                } else {
+                  props.setScreen('main');
+                }
+              }}
+            >
+              Start
+            </Button>
+            <Button
               className={classes.margin}
               onClick={() => {
                 localStorage.removeItem('collected');
               }}
             >
               Reset Collected
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              fullWidth
-              color="primary"
-              disableElevation
-              className={classes.margin}
-              onClick={() => {
-                props.setScreen('main');
-              }}
-            >
-              Start
             </Button>
           </Box>
         </Grid>

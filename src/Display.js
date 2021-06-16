@@ -1,16 +1,78 @@
+import {
+  Box,
+  Button,
+  Card as Mcard,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  Collapse,
+  Divider,
+  Drawer,
+  Fab,
+  Grid,
+  Hidden,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  makeStyles,
+  Paper,
+  Typography,
+} from '@material-ui/core';
+import { ExpandLess } from '@material-ui/icons';
 import React, { useState, useEffect } from 'react';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    minHeight: '100vh',
+  },
+  fab: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+  bottomDrawer: {
+    width: 'auto',
+  },
+  wall: {
+    backgroundColor: theme.palette.background.default,
+    justifyContent: 'flex-start',
+  },
+  fixed: {
+    position: 'fixed',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingInline: theme.spacing(3),
+  },
+  grayWall: {
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3),
+    alignItems: 'flex-start',
+  },
+  margin: {
+    marginTop: theme.spacing(2),
+  },
+  card: {
+    marginBlockStart: theme.spacing(1),
+    width: '100%',
+  },
+  sectionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingBlock: theme.spacing(2),
+    paddingInline: theme.spacing(1),
+    marginBlockStart: theme.spacing(1),
+    width: '100%',
+  },
+}));
 
 // card for the individual item
 function Card(props) {
+  const classes = useStyles();
   const collectedState = props.collected.includes(props.item._id);
-  let header = <h4>{props.item.type}</h4>;
-  if (props.item.name) {
-    header = (
-      <h4>
-        {props.item.type} - {props.item.name}
-      </h4>
-    );
-  }
   // function to mark collected
   const check = () => {
     if (collectedState) {
@@ -23,19 +85,39 @@ function Card(props) {
   };
   // 'collected' button goes here
   return (
-    <div>
-      {header}
-      <button onClick={() => check()}>
-        {collectedState ? 'Uncheck' : 'Check'}
-      </button>
-      <p>{props.item.description}</p>
-    </div>
+    <Mcard className={classes.card}>
+      <CardHeader
+        title={props.item.name || props.item.type}
+        subheader={props.item.name ? props.item.type : ''}
+        titleTypographyProps={{
+          variant: 'h6',
+          color: collectedState ? 'textSecondary' : 'textPrimary',
+        }}
+        action={
+          <IconButton>
+            <Checkbox
+              color="primary"
+              checked={collectedState}
+              disableRipple
+              tabIndex={-1}
+            />
+          </IconButton>
+        }
+        onClick={() => check()}
+      />
+      <Collapse in={!collectedState} timeout="auto" unmountOnExit>
+        <CardContent>
+          <Typography>{props.item.description}</Typography>
+        </CardContent>
+      </Collapse>
+    </Mcard>
   );
 }
 
 // the list of items by section
 function Display(props) {
   const [arts, setArts] = useState([]);
+  const [drawerOpen, setDrawer] = useState(false);
   // 'collected' state lives here
   const [collected, setCollected] = useState([]);
   const apiUrl = props.api;
@@ -52,6 +134,7 @@ function Display(props) {
       console.error(e);
     }
   }
+  const classes = useStyles();
 
   // 'collected' is loaded from the storage
   useEffect(() => {
@@ -104,13 +187,21 @@ function Display(props) {
     // each section has a header
     for (const section of arts) {
       list.push(
-        <h3 key={section._id}>
-          {section.chapter} - {section.name}
-        </h3>
+        <Box className={classes.sectionHeader} key={section._id}>
+          <Typography component="h2" variant="h6">
+            {section.chapter} - {section.name}
+          </Typography>
+        </Box>
       );
       // if there is nothing to display
       if (!section.articles.length) {
-        list.push(<p key={section.name}>No items to display</p>);
+        list.push(
+          <Box className={classes.sectionHeader} key={section.name}>
+            <Typography component="p" variant="subtitle1">
+              No items to display
+            </Typography>
+          </Box>
+        );
       }
       // otherwise display items
       for (const article of section.articles) {
@@ -125,23 +216,98 @@ function Display(props) {
       }
     }
     list.push(
-      <button key={'next'} onClick={() => setNextSection()}>
+      <Button
+        key={'next'}
+        className={classes.margin}
+        color="default"
+        onClick={() => setNextSection()}
+      >
         Next Section
-      </button>
+      </Button>
     );
   }
   return (
-    <>
-      <div>{list}</div>
-      {/* TODO wrap these buttons in the options menu */}
-      <div>
-        <button onClick={() => props.setScreen('home')}>Main Menu</button>
-        <button onClick={() => props.setScreen('select')}>Game Menu</button>
-        <button onClick={() => resetCollected()}>
-          Reset Displayed Collected
-        </button>
-      </div>
-    </>
+    <Grid
+      container
+      component="main"
+      alignItems="stretch"
+      className={classes.root}
+    >
+      <Grid
+        container
+        item
+        xs={12}
+        sm={8}
+        md={9}
+        component={Paper}
+        square
+        className={classes.grayWall}
+        direction="column"
+      >
+        {list}
+      </Grid>
+      <Hidden xsDown>
+        <Grid
+          container
+          direction="column"
+          item
+          sm={4}
+          md={3}
+          className={classes.wall}
+        >
+          <Box className={classes.fixed}>
+            <Button
+              className={classes.margin}
+              onClick={() => props.setScreen('home')}
+            >
+              Main Menu
+            </Button>
+            <Button
+              className={classes.margin}
+              onClick={() => props.setScreen('select')}
+            >
+              Game Menu
+            </Button>
+            <Button className={classes.margin} onClick={() => resetCollected()}>
+              Reset Collected
+            </Button>
+          </Box>
+        </Grid>
+      </Hidden>
+      <Hidden smUp implementation="css">
+        <Fab
+          color="primary"
+          className={classes.fab}
+          onClick={() => setDrawer(true)}
+        >
+          <ExpandLess />
+        </Fab>
+        <Drawer
+          anchor="bottom"
+          open={drawerOpen}
+          onClose={() => setDrawer(false)}
+        >
+          <List className={classes.bottomDrawer}>
+            <ListItem button onClick={() => props.setScreen('home')}>
+              <ListItemText primary="Main Menu" />
+            </ListItem>
+            <ListItem button onClick={() => props.setScreen('select')}>
+              <ListItemText primary="Game Menu" />
+            </ListItem>
+            <Divider />
+            <ListItem
+              button
+              onClick={() => {
+                resetCollected();
+                setDrawer(false);
+              }}
+            >
+              <ListItemText primary="Reset Displayed Collected" />
+            </ListItem>
+          </List>
+        </Drawer>
+      </Hidden>
+    </Grid>
   );
 }
 
