@@ -19,7 +19,7 @@ function App() {
     types: [],
   });
   // TODO set for the actual backend
-  const apiUrl = 'http://localhost:1337/api';
+  const apiUrl = 'https://calm-headland-01615.herokuapp.com:54690/api';
 
   const darkTheme = createMuiTheme({
     palette: { type: 'dark', primary: amber },
