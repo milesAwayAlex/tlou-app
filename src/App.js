@@ -18,6 +18,7 @@ function App() {
     sections: [],
     types: [],
   });
+  // TODO set for the actual backend
   const apiUrl = 'http://localhost:1337/api';
 
   const darkTheme = createMuiTheme({

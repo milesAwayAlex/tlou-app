@@ -34,10 +34,10 @@ const useStyles = makeStyles(theme => ({
 
 function Homepage(props) {
   const [games, setGames] = useState([]);
-  const apiUrl = props.api;
   useEffect(() => {
     // this was intended to prevent the state update on an unmounted component
     let isMounted = true;
+    const apiUrl = props.api;
     async function getData() {
       try {
         const response = await fetch(apiUrl + '/games');
@@ -55,8 +55,7 @@ function Homepage(props) {
     return () => {
       isMounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [props.api]);
   const classes = useStyles();
 
   let list = (

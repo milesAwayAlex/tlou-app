@@ -124,19 +124,7 @@ function Display(props) {
   // 'collected' state lives here
   const [collected, setCollected] = useState([]);
   const apiUrl = props.api;
-  async function getArticles() {
-    try {
-      const response = await fetch(apiUrl + '/display', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(props.selected),
-      });
-      const json = await response.json();
-      setArts(json);
-    } catch (e) {
-      console.error(e);
-    }
-  }
+
   const classes = useStyles();
 
   // 'collected' is loaded from the storage
@@ -155,9 +143,21 @@ function Display(props) {
   }, [collected]);
 
   useEffect(() => {
+    async function getArticles() {
+      try {
+        const response = await fetch(apiUrl + '/display', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(props.selected),
+        });
+        const json = await response.json();
+        setArts(json);
+      } catch (e) {
+        console.error(e);
+      }
+    }
     getArticles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.selected]);
+  }, [apiUrl, props.selected]);
 
   // function to reset collected for displayed items
   const resetCollected = () => {

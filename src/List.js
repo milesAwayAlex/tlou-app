@@ -76,35 +76,29 @@ const useStyles = makeStyles(theme => ({
 function Item(props) {
   // for chapters - whether to show sections or not
   const [showSections, setShow] = useState(false);
+  const itemId = props.item._id;
   let button;
   let sections;
   // for types - select or remove the type
   let select = () => {
-    if (!props.selected.types.includes(props.item._id)) {
+    if (!props.selected.types.includes(itemId)) {
       props.setSelected({
         ...props.selected,
-        types: props.selected.types.concat(props.item._id),
+        types: props.selected.types.concat(itemId),
       });
     } else {
       props.setSelected({
         ...props.selected,
-        types: props.selected.types.filter(typeid => typeid !== props.item._id),
+        types: props.selected.types.filter(typeid => typeid !== itemId),
       });
     }
   };
-  let selected = props.selected.types.includes(props.item._id);
+  let selected = props.selected.types.includes(itemId);
   let indeterminate = false;
-  // let selButton = (
-  //   <button
-  //     onClick={() => {
-  //       select();
-  //     }}
-  //   >
-  //     {selected ? 'Remove' : 'Select'}
-  //   </button>
-  // );
+
   // chapters have different buttons
   if (props.item.sections) {
+    const chapSecIds = props.item.sections.map(s => s._id);
     // toggle sections display
     button = (
       <ListItemSecondaryAction>
@@ -114,21 +108,19 @@ function Item(props) {
       </ListItemSecondaryAction>
     );
     // test if all sections of the chapter are selected
-    selected = props.item.sections.every(section =>
-      props.selected.sections.includes(section._id)
+    selected = chapSecIds.every(section =>
+      props.selected.sections.includes(section)
     );
     indeterminate = selected
       ? false
-      : props.item.sections.some(section =>
-          props.selected.sections.includes(section._id)
-        );
+      : chapSecIds.some(section => props.selected.sections.includes(section));
     select = () => {
       if (!selected) {
         // determine which sections need to be added to the selection
         let sections = [];
-        props.item.sections.forEach(section => {
-          if (!props.selected.sections.includes(section._id)) {
-            sections.push(section._id);
+        chapSecIds.forEach(section => {
+          if (!props.selected.sections.includes(section)) {
+            sections.push(section);
           }
         });
         // add the sections to the selection
@@ -141,24 +133,11 @@ function Item(props) {
         props.setSelected({
           ...props.selected,
           sections: props.selected.sections.filter(
-            sectionid =>
-              !props.item.sections
-                .map(section => section._id)
-                .includes(sectionid)
+            sectionid => !chapSecIds.includes(sectionid)
           ),
         });
       }
     };
-    // selButton = (
-    //   <button
-    //     onClick={() => {
-    //       select();
-    //     }}
-    //   >
-    //     {selected ? 'Remove Chapter' : 'Select Chapter'}
-    //   </button>
-    // );
-
     // only generate sections for chapters
     sections = (
       <Collapse in={showSections} timeout="auto" unmountOnExit>
@@ -175,43 +154,33 @@ function Item(props) {
       </Collapse>
     );
   }
+
   // sections have the third set of buttons
   if (props.item.articles) {
     select = () => {
       // if the section is not selected - add it to the selection
-      if (!props.selected.sections.includes(props.item._id)) {
+      if (!props.selected.sections.includes(itemId)) {
         props.setSelected({
           ...props.selected,
-          sections: props.selected.sections.concat(props.item._id),
+          sections: props.selected.sections.concat(itemId),
         });
       } else {
         // otherwise remove it
         props.setSelected({
           ...props.selected,
           sections: props.selected.sections.filter(
-            sectionid => sectionid !== props.item._id
+            sectionid => sectionid !== itemId
           ),
         });
       }
     };
-    selected = props.selected.sections.includes(props.item._id);
-    // selButton = (
-    //   <button
-    //     onClick={() => {
-    //       select();
-    //     }}
-    //   >
-    //     {selected ? 'Remove' : 'Select'}
-    //   </button>
-    // );
+    selected = props.selected.sections.includes(itemId);
   }
 
   return (
     <>
       <ListItem
-        // dense
         button
-        // role={undefined}
         onClick={() => {
           select();
         }}
@@ -224,7 +193,6 @@ function Item(props) {
             indeterminate={indeterminate}
             checked={selected}
             color="primary"
-            // size="small"
           />
         </ListItemIcon>
         <ListItemText primary={props.item.name} />
@@ -310,26 +278,26 @@ function Category(props) {
 function List(props) {
   // fetched data
   const [data, setData] = useState({});
+  const gameName = props.selected.game;
   const apiUrl = props.api;
-  async function getData() {
-    try {
-      const response = await fetch(apiUrl + '/select', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(props.selected),
-      });
-      const json = await response.json();
-      setData(json);
-    } catch (e) {
-      console.error(e);
-    }
-  }
   useEffect(() => {
+    async function getData() {
+      try {
+        const response = await fetch(apiUrl + '/select', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ game: gameName }),
+        });
+        const json = await response.json();
+        setData(json);
+      } catch (e) {
+        console.error(e);
+      }
+    }
     getData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [apiUrl, gameName]);
   const classes = useStyles();
 
   // function to set selected to section 1
@@ -338,7 +306,7 @@ function List(props) {
       const res = await fetch(apiUrl + '/next', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([]),
+        body: '[]',
       });
       const json = await res.json();
       props.setSelected({ ...props.selected, sections: [json._id] });
@@ -354,13 +322,11 @@ function List(props) {
     for (const cat in data) {
       // check if data has the category in it
       if (Object.hasOwnProperty.call(data, cat)) {
-        // get the array of items for that category
-        const element = data[cat];
         // add the category to be displayed
         list.push(
           <Category
             catName={cat}
-            catArray={element}
+            catArray={data[cat]}
             key={cat}
             selected={props.selected}
             setSelected={props.setSelected}
@@ -371,87 +337,85 @@ function List(props) {
   }
   // display the list of categories and the button to go to the items
   return (
-    <>
+    <Grid
+      container
+      component="main"
+      alignItems="stretch"
+      className={classes.root}
+    >
       <Grid
         container
-        component="main"
-        alignItems="stretch"
-        className={classes.root}
+        item
+        xs={12}
+        sm={8}
+        md={9}
+        component={Paper}
+        square
+        className={classes.grayWall}
       >
-        <Grid
-          container
-          item
-          xs={12}
-          sm={8}
-          md={9}
-          component={Paper}
-          square
-          className={classes.grayWall}
-        >
-          <Grid item xs={12} className={classes.pageHeader}>
-            <Typography component="h1" variant="h3">
-              {props.selected.game}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {list[0]}
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {list[1]}
-          </Grid>
+        <Grid item xs={12} className={classes.pageHeader}>
+          <Typography component="h1" variant="h3">
+            {props.selected.game}
+          </Typography>
         </Grid>
-        <Grid
-          container
-          direction="column"
-          item
-          xs={12}
-          sm={4}
-          md={3}
-          className={classes.wall}
-        >
-          <Box className={classes.fixed}>
-            <Box></Box>
-            <Box>
-              <Button
-                className={classes.margin}
-                onClick={() => {
-                  props.setScreen('home');
-                }}
-              >
-                Main Menu
-              </Button>
-              <Button
-                className={classes.margin}
-                onClick={() => {
-                  if (!props.selected.types.length) {
-                    props.setSelected({
-                      ...props.selected,
-                      types: data.types.map(type => type._id),
-                    });
-                  } else if (!props.selected.sections.length) {
-                    setFirstSection();
-                    props.setScreen('main');
-                  } else {
-                    props.setScreen('main');
-                  }
-                }}
-              >
-                Start
-              </Button>
-              <Button
-                className={classes.margin}
-                onClick={() => {
-                  localStorage.removeItem('collected');
-                }}
-              >
-                Reset Collected
-              </Button>
-            </Box>
-            <Box className={classes.credits}>{props.credits}</Box>
-          </Box>
+        <Grid item xs={12} md={6}>
+          {list[0]}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {list[1]}
         </Grid>
       </Grid>
-    </>
+      <Grid
+        container
+        direction="column"
+        item
+        xs={12}
+        sm={4}
+        md={3}
+        className={classes.wall}
+      >
+        <Box className={classes.fixed}>
+          <Box></Box>
+          <Box>
+            <Button
+              className={classes.margin}
+              onClick={() => {
+                props.setScreen('home');
+              }}
+            >
+              Main Menu
+            </Button>
+            <Button
+              className={classes.margin}
+              onClick={() => {
+                if (!props.selected.types.length) {
+                  props.setSelected({
+                    ...props.selected,
+                    types: data.types.map(type => type._id),
+                  });
+                } else if (!props.selected.sections.length) {
+                  setFirstSection();
+                  props.setScreen('main');
+                } else {
+                  props.setScreen('main');
+                }
+              }}
+            >
+              Start
+            </Button>
+            <Button
+              className={classes.margin}
+              onClick={() => {
+                localStorage.removeItem('collected');
+              }}
+            >
+              Reset Collected
+            </Button>
+          </Box>
+          <Box className={classes.credits}>{props.credits}</Box>
+        </Box>
+      </Grid>
+    </Grid>
   );
 }
 
