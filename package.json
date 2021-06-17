@@ -2,6 +2,7 @@
   "name": "tlou-app",
   "version": "0.1.0",
   "description": "Client side of the TLoU Collectible App",
+  "homepage": "http://milesAwayAlex.github.io/tlou-app",
   "private": true,
   "dependencies": {
     "@fontsource/roboto": "^4.3.0",
@@ -19,7 +20,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
