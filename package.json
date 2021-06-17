@@ -1,6 +1,7 @@
 {
-  "name": "client",
+  "name": "tlou-app",
   "version": "0.1.0",
+  "description": "Client side of the TLoU Collectible App",
   "private": true,
   "dependencies": {
     "@fontsource/roboto": "^4.3.0",
@@ -37,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^3.2.1"
   }
 }
