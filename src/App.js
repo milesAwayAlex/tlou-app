@@ -12,7 +12,7 @@ import {
 import { amber } from '@material-ui/core/colors';
 
 function App() {
-  const [screen, setScreen] = useState('');
+  const [screen, setScreen] = useState('home');
   const [selected, setSelected] = useState({
     game: '',
     sections: [],
@@ -39,22 +39,13 @@ function App() {
 
   // load the state from localStorage
   useEffect(() => {
-    const savedScreen = localStorage.getItem('screen');
     const savedSelected = localStorage.getItem('selected');
-    if (savedScreen) {
-      setScreen(savedScreen);
-    } else {
-      // if nothing was loaded from the local storage, set screen to 'home'
-      // this prevents the fetch call from Homepage if storage is used
-      setScreen('home');
-    }
     if (savedSelected) {
       setSelected(JSON.parse(savedSelected));
     }
   }, []);
   // save the state to localStorage when the values change
   useEffect(() => {
-    localStorage.setItem('screen', screen);
     localStorage.setItem('selected', JSON.stringify(selected));
   }, [screen, selected]);
   const credits = (
