@@ -19,7 +19,7 @@ import {
   Paper,
   Typography,
 } from '@material-ui/core';
-import { ExpandLess } from '@material-ui/icons';
+import { MenuRounded } from '@material-ui/icons';
 import React, { useState, useEffect } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -28,6 +28,8 @@ const useStyles = makeStyles(theme => ({
   },
   fab: {
     position: 'fixed',
+    color: theme.palette.primary.dark,
+    backgroundColor: theme.palette.grey[900],
     bottom: theme.spacing(2),
     right: theme.spacing(2),
   },
@@ -43,9 +45,10 @@ const useStyles = makeStyles(theme => ({
     height: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingInline: theme.spacing(3),
   },
+  credits: { paddingBlock: theme.spacing(3) },
   grayWall: {
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
@@ -256,31 +259,34 @@ function Display(props) {
           className={classes.wall}
         >
           <Box className={classes.fixed}>
-            <Button
-              className={classes.margin}
-              onClick={() => props.setScreen('home')}
-            >
-              Main Menu
-            </Button>
-            <Button
-              className={classes.margin}
-              onClick={() => props.setScreen('select')}
-            >
-              Game Menu
-            </Button>
-            <Button className={classes.margin} onClick={() => resetCollected()}>
-              Reset Collected
-            </Button>
+            <Box></Box>
+            <Box>
+              <Button
+                className={classes.margin}
+                onClick={() => props.setScreen('home')}
+              >
+                Main Menu
+              </Button>
+              <Button
+                className={classes.margin}
+                onClick={() => props.setScreen('select')}
+              >
+                Game Menu
+              </Button>
+              <Button
+                className={classes.margin}
+                onClick={() => resetCollected()}
+              >
+                Reset Collected
+              </Button>
+            </Box>
+            <Box className={classes.credits}>{props.credits}</Box>
           </Box>
         </Grid>
       </Hidden>
       <Hidden smUp implementation="css">
-        <Fab
-          color="primary"
-          className={classes.fab}
-          onClick={() => setDrawer(true)}
-        >
-          <ExpandLess />
+        <Fab className={classes.fab} onClick={() => setDrawer(true)}>
+          <MenuRounded fontSize="large" />
         </Fab>
         <Drawer
           anchor="bottom"

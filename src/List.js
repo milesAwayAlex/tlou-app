@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
     height: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingInline: theme.spacing(3),
     [theme.breakpoints.down('xs')]: {
       position: 'static',
@@ -49,6 +49,7 @@ const useStyles = makeStyles(theme => ({
   margin: {
     marginTop: theme.spacing(2),
   },
+  credits: { paddingBlock: theme.spacing(3) },
   list: {
     width: '100%',
   },
@@ -409,40 +410,44 @@ function List(props) {
           className={classes.wall}
         >
           <Box className={classes.fixed}>
-            <Button
-              className={classes.margin}
-              onClick={() => {
-                props.setScreen('home');
-              }}
-            >
-              Main Menu
-            </Button>
-            <Button
-              className={classes.margin}
-              onClick={() => {
-                if (!props.selected.types.length) {
-                  props.setSelected({
-                    ...props.selected,
-                    types: data.types.map(type => type._id),
-                  });
-                } else if (!props.selected.sections.length) {
-                  setFirstSection();
-                  props.setScreen('main');
-                } else {
-                  props.setScreen('main');
-                }
-              }}
-            >
-              Start
-            </Button>
-            <Button
-              className={classes.margin}
-              onClick={() => {
-                localStorage.removeItem('collected');
-              }}
-            >
-              Reset Collected
-            </Button>
+            <Box></Box>
+            <Box>
+              <Button
+                className={classes.margin}
+                onClick={() => {
+                  props.setScreen('home');
+                }}
+              >
+                Main Menu
+              </Button>
+              <Button
+                className={classes.margin}
+                onClick={() => {
+                  if (!props.selected.types.length) {
+                    props.setSelected({
+                      ...props.selected,
+                      types: data.types.map(type => type._id),
+                    });
+                  } else if (!props.selected.sections.length) {
+                    setFirstSection();
+                    props.setScreen('main');
+                  } else {
+                    props.setScreen('main');
+                  }
+                }}
+              >
+                Start
+              </Button>
+              <Button
+                className={classes.margin}
+                onClick={() => {
+                  localStorage.removeItem('collected');
+                }}
+              >
+                Reset Collected
+              </Button>
+            </Box>
+            <Box className={classes.credits}>{props.credits}</Box>
           </Box>
         </Grid>
       </Grid>

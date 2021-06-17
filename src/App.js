@@ -3,7 +3,12 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import List from './List.js';
 import Homepage from './Homepage.js';
 import Display from './Display.js';
-import { createMuiTheme, ThemeProvider, Typography } from '@material-ui/core';
+import {
+  createMuiTheme,
+  Link,
+  ThemeProvider,
+  Typography,
+} from '@material-ui/core';
 import { amber } from '@material-ui/core/colors';
 
 function App() {
@@ -52,6 +57,23 @@ function App() {
     localStorage.setItem('screen', screen);
     localStorage.setItem('selected', JSON.stringify(selected));
   }, [screen, selected]);
+  const credits = (
+    <Typography
+      component="p"
+      variant="subtitle2"
+      color="textSecondary"
+      align="center"
+    >
+      by{' '}
+      <Link
+        color="textSecondary"
+        underline="always"
+        href="https://github.com/milesAwayAlex"
+      >
+        @milesAwayAlex
+      </Link>
+    </Typography>
+  );
 
   let view = <Typography component="h1"> Loading..</Typography>;
   // only render the Homepage if the effects have finished running
@@ -62,6 +84,7 @@ function App() {
         selected={selected}
         setSelected={setSelected}
         api={apiUrl}
+        credits={credits}
       />
     );
   } else if (screen === 'select') {
@@ -71,6 +94,7 @@ function App() {
         selected={selected}
         setSelected={setSelected}
         api={apiUrl}
+        credits={credits}
       />
     );
   } else if (screen === 'main') {
@@ -80,6 +104,7 @@ function App() {
         selected={selected}
         setSelected={setSelected}
         api={apiUrl}
+        credits={credits}
       />
     );
   }

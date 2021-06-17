@@ -1,4 +1,11 @@
-import { Button, Grid, makeStyles, Paper, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Grid,
+  makeStyles,
+  Paper,
+  Typography,
+} from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -8,9 +15,7 @@ const useStyles = makeStyles(theme => ({
   wall: {
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
-    [theme.breakpoints.down('xs')]: {
-      justifyContent: 'flex-start',
-    },
+    justifyContent: 'space-between',
   },
   grayWall: {
     backgroundColor: theme.palette.background.paper,
@@ -20,6 +25,10 @@ const useStyles = makeStyles(theme => ({
   },
   margin: {
     marginTop: theme.spacing(2),
+    [theme.breakpoints.down('xs')]: {
+      marginTop: 0,
+      marginBlockEnd: theme.spacing(2),
+    },
   },
 }));
 
@@ -116,7 +125,9 @@ function Homepage(props) {
           sm={5}
           className={classes.wall}
         >
-          {list}
+          <Box></Box>
+          <Box>{list}</Box>
+          <Box className={classes.margin}>{props.credits}</Box>
         </Grid>
       </Grid>
     </>
