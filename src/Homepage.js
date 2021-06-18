@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(2),
     [theme.breakpoints.down('xs')]: {
       marginTop: 0,
-      marginBlockEnd: theme.spacing(2),
+      marginBottom: theme.spacing(2),
     },
   },
 }));

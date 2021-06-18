@@ -31,11 +31,14 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    paddingInline: theme.spacing(3),
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
     [theme.breakpoints.down('xs')]: {
       position: 'static',
       height: 'auto',
-      paddingBlockEnd: theme.spacing(3),
+      paddingBottom: theme.spacing(3),
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(2),
     },
   },
   grayWall: {
@@ -49,7 +52,7 @@ const useStyles = makeStyles(theme => ({
   margin: {
     marginTop: theme.spacing(2),
   },
-  credits: { paddingBlock: theme.spacing(3) },
+  credits: { paddingTop: theme.spacing(3), paddingBottom: theme.spacing(3) },
   list: {
     width: '100%',
   },
@@ -57,17 +60,20 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingBlockStart: theme.spacing(3),
+    paddingTop: theme.spacing(3),
   },
   pageHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingBlock: theme.spacing(2),
-    paddingInline: theme.spacing(4),
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(4),
     [theme.breakpoints.down('sm')]: {
       justifyContent: 'center',
-      paddingInline: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
     },
   },
 }));
